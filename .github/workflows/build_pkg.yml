@@ -126,7 +126,7 @@ jobs:
                        --resources Resources \
                        --package-path . \
                        --version 1.0 \
-                       PyLabelInstaller.pkg
+                       MacInstall.pkg
 
       - name: List files after productbuild
         run: |

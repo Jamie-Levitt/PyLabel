@@ -134,8 +134,15 @@ jobs:
           ls -la
           ls -la PyLabelProgramFiles
 
-      - name: Upload package
-        uses: actions/upload-artifact@v2
-        with:
-          name: PyLabelInstaller.pkg
-          path: PyLabelInstaller.pkg
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Commit and push .pkg file
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git add PyLabelInstaller.pkg
+          git commit -m "Add PyLabelInstaller.pkg"
+          git push -u origin main

@@ -1,4 +1,4 @@
-name: Build macOS Package
+name: Build PyLabel macOS Package
 
 on:
   push:

@@ -11,5 +11,5 @@
     <choice id="pylabel" visible="false" title="PyLabel">
         <pkg-ref id="com.LevittConsultingPtyLtd.pylabel"/>
     </choice>
-    <pkg-ref id="com.LevittConsultingPtyLtd.pylabel" installKBytes="0" version="1.0"/>
+    <pkg-ref id="com.LevittConsultingPtyLtd.pylabel" version="1.0" onConclusion="none">file:MacInstall.pkg</pkg-ref>
 </installer-gui-script>

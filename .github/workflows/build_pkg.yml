@@ -73,6 +73,12 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r PyLabelProgramFiles/requirements.txt
 
+      - name: List files before pkgbuild
+        run: |
+          echo "Listing files before pkgbuild:"
+          ls -la
+          ls -la PyLabelProgramFiles
+
       - name: Create the component package
         run: |
           pkgbuild --root PyLabelProgramFiles \
@@ -81,6 +87,12 @@ jobs:
                    --version 1.0 \
                    --install-location /Applications/PyLabel \
                    MacInstall.pkg
+
+      - name: List files after pkgbuild
+        run: |
+          echo "Listing files after pkgbuild:"
+          ls -la
+          ls -la PyLabelProgramFiles
 
       - name: Create distribution.xml
         run: |
@@ -102,6 +114,12 @@ jobs:
           </installer-gui-script>
           EOF
 
+      - name: List files before productbuild
+        run: |
+          echo "Listing files before productbuild:"
+          ls -la
+          ls -la PyLabelProgramFiles
+
       - name: Build the final package
         run: |
           productbuild --distribution distribution.xml \
@@ -109,6 +127,12 @@ jobs:
                        --package-path . \
                        --version 1.0 \
                        PyLabelInstaller.pkg
+
+      - name: List files after productbuild
+        run: |
+          echo "Listing files after productbuild:"
+          ls -la
+          ls -la PyLabelProgramFiles
 
       - name: Upload package
         uses: actions/upload-artifact@v2

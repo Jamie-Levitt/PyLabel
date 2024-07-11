@@ -91,15 +91,12 @@ jobs:
 
       - name: Create the component package
         run: |
-          START_TIME=$(date +%s)
           pkgbuild --root PyLabelProgramFiles \
                    --scripts Scripts \
                    --identifier com.LevittConsultingPtyLtd.pylabel \
                    --version 1.0 \
                    --install-location /Applications/PyLabel \
                    MacInstall.pkg
-          END_TIME=$(date +%s)
-          echo "pkgbuild duration: $(($END_TIME - $START_TIME)) seconds"
 
       - name: List files after pkgbuild
         run: |
@@ -140,7 +137,7 @@ jobs:
                        --resources Resources \
                        --package-path . \
                        --version 1.0 \
-                       MacInstall.pkg
+                       PyLabelInstaller.pkg
           END_TIME=$(date +%s)
           echo "productbuild duration: $(($END_TIME - $START_TIME)) seconds"
 
@@ -159,6 +156,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add MacInstall.pkg
-          git commit -m "Add MacInstall.pkg"
+          git add PyLabelInstaller.pkg
+          git commit -m "Add PyLabelInstaller.pkg"
           git push
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: PyLabelInstaller.pkg
+          path: PyLabelInstaller.pkg

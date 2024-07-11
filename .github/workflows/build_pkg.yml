@@ -1,0 +1,80 @@
+name: Build macOS Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.9'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r PyLabelProgramFiles/requirements.txt
+
+      - name: Create MacInstall.sh script
+        run: |
+          mkdir -p Scripts
+          echo '#!/bin/bash' > Scripts/MacInstall.sh
+          echo 'PROGRAM_FILES="/Applications/PyLabel"' >> Scripts/MacInstall.sh
+          echo 'if [ ! -d "$PROGRAM_FILES" ]; then' >> Scripts/MacInstall.sh
+          echo '    mkdir -p "$PROGRAM_FILES"' >> Scripts/MacInstall.sh
+          echo 'fi' >> Scripts/MacInstall.sh
+          echo 'cp -R "${0%/*}/PyLabelProgramFiles/" "$PROGRAM_FILES/"' >> Scripts/install.sh
+          echo 'chmod -R 755 "$PROGRAM_FILES"' >> Scripts/MacInstall.sh
+          echo 'found_python=false' >> Scripts/MacInstall.sh
+          echo 'for py_path in $(which -a python3); do' >> Scripts/MacInstall.sh
+          echo '    py_version=$($py_path --version 2>&1)' >> Scripts/MacInstall.sh
+          echo '    if [[ $py_version == "Python 3.11.9" ]]; then' >> Scripts/MacInstall.sh
+          echo '        found_python=true' >> Scripts/MacInstall.sh
+          echo '        break' >> Scripts/MacInstall.sh
+          echo '    fi' >> Scripts/MacInstall.sh
+          echo 'done' >> Scripts/MacInstall.sh
+          echo 'if [ "$found_python" = true ]; then' >> Scripts/MacInstall.sh
+          echo '    "$py_path" -m ensurepip' >> Scripts/MacInstall.sh
+          echo '    "$py_path" -m pip install --upgrade pip' >> Scripts/install.sh
+          echo '    "$py_path" -m pip install -r "$PROGRAM_FILES/requirements.txt"' >> Scripts/MacInstall.sh
+          echo '    echo "#!/bin/bash" > /usr/local/bin/PyLabel' >> Scripts/MacInstall.sh
+          echo '    echo "\"$py_path\" \"$PROGRAM_FILES/PyLabel.py\" \"\$@\"" >> /usr/local/bin/PyLabel' >> Scripts/MacInstall.sh
+          echo '    chmod +x /usr/local/bin/PyLabel' >> Scripts/MacInstall.sh
+          echo 'else' >> Scripts/MacInstall.sh
+          echo '    echo "Python 3.11.9 is not installed."' >> Scripts/MacInstall.sh
+          echo '    open "$PROGRAM_FILES/PyInstructions.pdf"' >> Scripts/MacInstall.sh
+          echo '    exit 1' >> Scripts/MacInstall.sh
+          echo 'fi' >> Scripts/MacInstall.sh
+          echo 'echo "Installation complete. You can now use the command 'PyLabel' from any directory"' >> Scripts/MacInstall.sh
+          chmod +x Scripts/MacInstall.sh
+
+      - name: Create the component package
+        run: |
+          pkgbuild --root PyLabelProgramFiles \
+                   --scripts Scripts \
+                   --identifier com.yourcompany.pylabel \
+                   --version 1.0 \
+                   --install-location /Applications/PyLabel \
+                   pylabel.pkg
+
+      - name: Create the distribution package
+        run: |
+          productbuild --distribution distribution.xml \
+                       --resources Resources \
+                       --package-path . \
+                       --version 1.0 \
+                       PyLabelInstaller.pkg
+
+      - name: Upload package
+        uses: actions/upload-artifact@v2
+        with:
+          name: PyLabelInstaller.pkg
+          path: PyLabelInstaller.pkg

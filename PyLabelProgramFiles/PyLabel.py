@@ -92,6 +92,15 @@ def generate_image(text_list:list, image_width_mm:int, spacing_mm:int, aTL: Opti
         draw.text((5, current_height_px), text, font=font, fill="black", align='left')
         current_height_px += text_height + spacing_px
 
+    current_height_px = 0
+
+    for text in text_list:
+        font = ImageFont.truetype('arial.ttf', font_size)
+        text_bbox = draw.textbbox((0, 0), text, font=font)
+        text_height = text_bbox[3] - text_bbox[1]
+        draw.text((5, current_height_px), text, font=font, fill="black", align='left')
+        current_height_px += text_height + spacing_px
+
     total_height_px = current_height_px
     
     image = Image.new("RGB", (image_width_px, total_height_px), color="white")

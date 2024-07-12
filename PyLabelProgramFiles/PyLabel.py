@@ -121,9 +121,6 @@ def generate_image(text_list:list, image_width_mm:int, spacing_mm:int, aTL: Opti
         text_height = text_bbox[3] - text_bbox[1]
         draw.text((5, current_height_px), text, font=font, fill="black", align='left')
         current_height_px += text_height + spacing_px
-    
-    if(current_height_px != total_height_px):
-        image = 'error - ' + str(current_height_px) + ' | ' + str(total_height_px)
 
     #image.show()
     #image.save("C:\\Users\\jamie\\Desktop\\img.png")
